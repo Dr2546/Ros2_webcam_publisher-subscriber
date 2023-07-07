@@ -1,4 +1,5 @@
 import rclpy
+from rclpy.qos import qos_profile_sensor_data
 from rclpy.node import Node
 import cv2
 from sensor_msgs.msg import Image
@@ -8,8 +9,10 @@ class ImagePublisher(Node):
     def __init__(self):
         super().__init__("webcam_pub")
         self.bridge = CvBridge()
-        self.cap = cv2.VideoCapture(0)
-        self.pub = self.create_publisher(Image, "/video_stream", 10)
+        self.cap = cv2.VideoCapture(0, cv2.CAP_V4L)
+        self.cap.set(3,640)
+        self.cap.set(4,480)
+        self.pub = self.create_publisher(Image, "/video_stream", qos_profile_sensor_data)
         # self.rgb8pub = self.create_publisher(Image, "/image/rgb", 10)
         # self.bgr8pub = self.create_publisher(Image, "/image/bgr", 10)
         # self.mono8pub = self.create_publisher(Image, "/image/mono", 10)
@@ -31,7 +34,7 @@ class ImagePublisher(Node):
 
                 # # MONO8
                 # frame_mono = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                # self.mono8pub.publish(self.bridge.cv2_to_imgmsg(frame_mono, "mono8"))
+                #self.pub.publish(self.bridge.cv2_to_imgmsg(frame, "mono8"))
 
             except CvBridgeError as e:
                 print(e)
